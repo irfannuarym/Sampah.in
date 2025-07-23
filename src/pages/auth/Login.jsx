@@ -8,7 +8,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('admin');
+  const [role, setRole] = useState('');
 
   const { setLogin } = useAuthStore();
   const navigate = useNavigate();
@@ -17,24 +17,29 @@ export default function Login() {
     e.preventDefault();
 
     if (!username || !password) {
-      toast.error('Username dan password wajib diisi!');
+      toast.error('Username dan password harus diisi!');
       return;
     }
 
-    const savedUser = JSON.parse(localStorage.getItem('user'));
-
-    if (
-      !savedUser ||
-      savedUser.username !== username ||
-      savedUser.password !== password
-    ) {
-      toast.error('Mohon maaf, username atau password salah!');
+    if (!role) {
+      toast.error('Role harus dipilih!');
       return;
     }
 
-    setLogin(savedUser.role);
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const matchedUser = users.find(
+      (user) => user.username === username && user.password === password && user.role === role
+    );
+
+    if (!matchedUser) {
+      toast.error('Username, password, atau role salah!');
+      return;
+    }
+
+    setLogin(matchedUser);
     toast.success('Login berhasil!');
-    navigate('/dashboard');
+    localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
+    navigate(`/dashboard/${matchedUser.role}`);
   };
 
   return (
@@ -75,11 +80,12 @@ export default function Login() {
           <div>
             <label className="block mb-1 text-green-700">Role</label>
             <select
-              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 bg-white"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="admin">Pengelola</option>
+              <option value="">-- Pilih Role --</option>
+              <option value="pengelola">Pengelola</option>
               <option value="petugas">Petugas</option>
             </select>
           </div>

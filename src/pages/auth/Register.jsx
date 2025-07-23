@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -7,15 +6,22 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('admin');
+  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState('');
 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const validRoles = ['pengelola', 'petugas'];
+    if (!validRoles.includes(role)) {
+      toast.error('Role tidak valid!');
+      return;
+    }
+
     if (!username || !email || !password) {
-      toast.error('Semua field wajib diisi!');
+      toast.error('Semua field harus diisi!');
       return;
     }
 
@@ -24,62 +30,102 @@ export default function Register() {
       return;
     }
 
-    const newUser = { username, email, password, role };
-    localStorage.setItem('user', JSON.stringify(newUser));
+    if (password.length < 6) {
+      toast.error('Password minimal 6 karakter!');
+      return;
+    }
+
+    if (!role) {
+      toast.error('Role harus dipilih!');
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    if (users.some(user => user.email === email)) {
+      toast.error('Email sudah terdaftar!');
+      return;
+    }
+
+    if (users.some(user => user.username === username)) {
+      toast.error('Username sudah digunakan!');
+      return;
+    }
+
+    const newUser = { username, email, password, role, createdAt: new Date().toISOString() };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
 
     toast.success('Registrasi berhasil!');
+
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setRole('');
+
     navigate('/login');
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Registrasi Sampah.in</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-green-600">
+          Registrasi Sampah.in
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1">Username</label>
+            <label className="block mb-1 text-green-700">Username</label>
             <input
               type="text"
-              className="w-full border border-gray-300 px-3 py-2 rounded"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Masukkan username"
             />
           </div>
           <div>
-            <label className="block mb-1">Email</label>
+            <label className="block mb-1 text-green-700">Email</label>
             <input
               type="email"
-              className="w-full border border-gray-300 px-3 py-2 rounded"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukkan email"
             />
           </div>
           <div>
-            <label className="block mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full border border-gray-300 px-3 py-2 rounded"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan password"
-            />
+            <label className="block mb-1 text-green-700">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan password"
+              />
+              <span
+                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-green-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </span>
+            </div>
           </div>
           <div>
-            <label className="block mb-1">Role</label>
+            <label className="block mb-1 text-green-700">Role</label>
             <select
-              className="w-full border border-gray-300 px-3 py-2 rounded"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 bg-white"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="admin">Pengelola</option>
+              <option value="">-- Pilih Role --</option>
+              <option value="pengelola">Pengelola</option>
               <option value="petugas">Petugas</option>
             </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-500 transition"
           >
             Daftar
           </button>

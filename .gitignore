@@ -1,0 +1,23 @@
+node_modules/
+
+dist/
+
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.vscode/
+.idea/
+*.sw?
+
+.tailwind
+
+Use case.excalidraw
+Use case.png
+Working Doc.docx
