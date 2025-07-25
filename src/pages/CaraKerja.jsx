@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import CaraKerjaCard from '../components/CaraKerja/CaraKerjaCard';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 const steps = [
   {
@@ -31,13 +33,23 @@ const steps = [
 
 export default function CaraKerja() {
   return (
-    <div className="min-h-screen bg-green-100">
-      <div className="max-w-4xl mx-auto p-6 space-y-4">
-        <h1 className="text-3xl font-bold mb-6 text-green-500 drop-shadow-md hover:drop-shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="min-h-screen bg-green-100 relative">
+      <Link
+        to="/"
+        aria-label="Kembali ke Beranda"
+        className="absolute top-4 left-4 flex items-center gap-1 text-xl font-bold text-green-500 drop-shadow-md hover:drop-shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+      >
+        <ChevronLeftIcon className="h-5 w-5" />
+        <span className="-translate-y-[1px]">Beranda</span>
+      </Link>
+
+      <div className="max-w-4xl mx-auto p-6 space-y-4 pt-16">
+        <h1 className="text-center text-2xl md:text-3xl font-bold mb-14 text-green-500 drop-shadow-md hover:drop-shadow-xl hover:-translate-y-1 transition-all duration-300">
           Cara Kerja Sampah.in
         </h1>
+
         {steps.map((item) => (
-          <CaraKerjaCard key={item.step} {...item} />
+          <CaraKerjaCard key={`${item.step}-${item.title}`} {...item} />
         ))}
       </div>
     </div>

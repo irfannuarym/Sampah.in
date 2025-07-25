@@ -1,45 +1,62 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
+import { loginUser } from '../../services/api';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const { setLogin } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validRoles = ['pengelola', 'petugas', 'warga'];
+    if (!validRoles.includes(role)) {
+      toast.error('Role tidak valid!');
+      return;
+    }
 
     if (!username || !password) {
       toast.error('Username dan password harus diisi!');
       return;
     }
 
-    if (!role) {
-      toast.error('Role harus dipilih!');
-      return;
+    try {
+      setLoading(true);
+      const response = await loginUser({ username, password, role });
+
+      setLogin(response.user); 
+      localStorage.setItem('loggedInUser', JSON.stringify(response.user));
+      toast.success('Login berhasil!');
+
+      navigate(`/dashboard/${response.user.role}`);
+    } catch (error) {
+      toast.error(error.message || 'Login gagal');
+    } finally {
+      setLoading(false);
     }
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const matchedUser = users.find(
-      (user) => user.username === username && user.password === password && user.role === role
-    );
+    // const users = JSON.parse(localStorage.getItem('users')) || [];
+    // const matchedUser = users.find(
+    //   (user) => user.username === username && user.password === password && user.role === role
+    // );
 
-    if (!matchedUser) {
-      toast.error('Username, password, atau role salah!');
-      return;
-    }
+    // if (!matchedUser) {
+    //   toast.error('Username, password, atau role salah!');
+    //   return;
+    // }
 
-    setLogin(matchedUser);
-    toast.success('Login berhasil!');
-    localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
-    navigate(`/dashboard/${matchedUser.role}`);
+    // setLogin(matchedUser);
+    // toast.success('Login berhasil!');
+    // localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
+    // navigate(`/dashboard/${matchedUser.role}`);
   };
 
   return (
@@ -87,13 +104,15 @@ export default function Login() {
               <option value="">-- Pilih Role --</option>
               <option value="pengelola">Pengelola</option>
               <option value="petugas">Petugas</option>
+              <option value="warga">Warga</option>
             </select>
           </div>
           <button
             type="submit"
             className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-500 transition"
+            disabled={loading}
           >
-            Login
+            {loading ? 'Memproses...' : 'Login'}
           </button>
           <p className="text-sm text-center mt-4">
             Belum punya akun?{' '}

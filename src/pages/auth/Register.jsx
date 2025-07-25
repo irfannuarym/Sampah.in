@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { registerUser } from '../../services/api';
 
 export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState('user');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validRoles = ['pengelola', 'petugas'];
+    const validRoles = ['pengelola', 'petugas', 'warga'];
     if (!validRoles.includes(role)) {
       toast.error('Role tidak valid!');
       return;
@@ -35,35 +37,37 @@ export default function Register() {
       return;
     }
 
-    if (!role) {
-      toast.error('Role harus dipilih!');
-      return;
+    try {
+      setLoading(true);
+      await registerUser({ username, email, password, role });
+      toast.success('Registrasi berhasil!');
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setRole('user');
+      navigate('/login');
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Registrasi gagal!';
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+    // const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    if (users.some(user => user.email === email)) {
-      toast.error('Email sudah terdaftar!');
-      return;
-    }
+    // if (users.some(user => user.email === email)) {
+    //   toast.error('Email sudah terdaftar!');
+    //   return;
+    // }
 
-    if (users.some(user => user.username === username)) {
-      toast.error('Username sudah digunakan!');
-      return;
-    }
+    // if (users.some(user => user.username === username)) {
+    //   toast.error('Username sudah digunakan!');
+    //   return;
+    // }
 
-    const newUser = { username, email, password, role, createdAt: new Date().toISOString() };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    toast.success('Registrasi berhasil!');
-
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setRole('');
-
-    navigate('/login');
+    // const newUser = { username, email, password, role, createdAt: new Date().toISOString() };
+    // users.push(newUser);
+    // localStorage.setItem('users', JSON.stringify(users));
   };
 
   return (
@@ -121,13 +125,41 @@ export default function Register() {
               <option value="">-- Pilih Role --</option>
               <option value="pengelola">Pengelola</option>
               <option value="petugas">Petugas</option>
+              <option value="warga">Warga</option>
             </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-500 transition"
+            className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-500 transition flex justify-center items-center"
+            disabled={loading}
           >
-            Daftar
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Mendaftar...
+              </div>
+            ) : (
+              'Daftar'
+            )}
           </button>
           <p className="text-sm text-center mt-2">
             Sudah punya akun?{' '}

@@ -2,10 +2,12 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home';
 import CaraKerja from '../pages/CaraKerja';
+import TentangKami from '../pages/TentangKami';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import PengelolaDashboard from '../pages/dashboard/PengelolaDashboard';
 import PetugasDashboard from '../pages/dashboard/PetugasDashboard';
+import WargaDashboard from '../pages/dashboard/WargaDashboard';
 import NotFoundPage from '../pages/NotFoundPage';
 import { useAuthStore } from '../store/authStore';
 
@@ -17,6 +19,7 @@ export default function AppRouter() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/cara-kerja" element={<CaraKerja />} />
+        <Route path="/tentang-kami" element={<TentangKami />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFoundPage />} />
@@ -31,6 +34,9 @@ export default function AppRouter() {
       )}
       {user?.role === 'petugas' && (
         <Route path="/dashboard/petugas" element={<PetugasDashboard />} />
+      )}
+      {user?.role === 'warga' && (
+        <Route path="/dashboard/warga" element={<WargaDashboard />} />
       )}
       <Route path="/dashboard" element={<Navigate to={`/dashboard/${user?.role}`} replace />} />
       <Route path="*" element={<NotFoundPage />} />
