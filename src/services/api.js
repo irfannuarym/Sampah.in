@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 export async function registerUser(userData) {
   const response = await fetch(`${API_BASE_URL}/register`, {
@@ -11,24 +11,24 @@ export async function registerUser(userData) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Registrasi gagal');
+    throw new Error(errorData.error || errorData.message || 'Registrasi gagal');
   }
 
   return response.json();
 }
 
-export async function loginUser({ username, password, role }) {
+export async function loginUser({ email, password }) {
   const response = await fetch(`${API_BASE_URL}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ username, password, role }),
+    body: JSON.stringify({ email, password }),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Login gagal');
+    throw new Error(errorData.error || errorData.message || 'Login gagal');
   }
 
   return response.json();

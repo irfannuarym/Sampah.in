@@ -1,7 +1,7 @@
 import React from 'react';
 
 const steps = [
-  'Warga melaporkan data sampah melalui aplikasi, lalu memilih untuk mengantar ke TPS atau menunggu petugas menjemput dari rumah.',
+  'Warga melaporkan data sampah melalui aplikasi, lalu menunggu petugas menjemput dari rumah atau langsung mengantar ke TPS.',
   'Petugas menerima laporan, mencatat data, dan mengambil sampah sesuai jadwal.',
   'Sistem menyimpan data dan menampilkannya di dashboard warga dan petugas.',
   'Laporan otomatis dibuat setiap bulan berdasarkan data yang masuk.',

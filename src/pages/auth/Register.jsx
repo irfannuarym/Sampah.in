@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { registerUser } from '../../services/api';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+} from '@heroicons/react/24/outline';
 
 export default function Register() {
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -16,13 +22,13 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validRoles = ['pengelola', 'petugas', 'warga'];
+    const validRoles = ['admin', 'petugas', 'user'];
     if (!validRoles.includes(role)) {
       toast.error('Role tidak valid!');
       return;
     }
 
-    if (!username || !email || !password) {
+    if (!name || !birthdate || !phone || !email || !password) {
       toast.error('Semua field harus diisi!');
       return;
     }
@@ -39,35 +45,21 @@ export default function Register() {
 
     try {
       setLoading(true);
-      await registerUser({ username, email, password, role });
+      await registerUser({ name, birthdate, phone, email, password, role });
       toast.success('Registrasi berhasil!');
-      setUsername('');
+      setName('');
+      setBirthdate('');
+      setPhone('');
       setEmail('');
       setPassword('');
-      setRole('user');
+      setRole('');
       navigate('/login');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Registrasi gagal!';
+      const msg = error.message || 'Registrasi gagal!';
       toast.error(msg);
     } finally {
       setLoading(false);
     }
-
-    // const users = JSON.parse(localStorage.getItem('users')) || [];
-
-    // if (users.some(user => user.email === email)) {
-    //   toast.error('Email sudah terdaftar!');
-    //   return;
-    // }
-
-    // if (users.some(user => user.username === username)) {
-    //   toast.error('Username sudah digunakan!');
-    //   return;
-    // }
-
-    // const newUser = { username, email, password, role, createdAt: new Date().toISOString() };
-    // users.push(newUser);
-    // localStorage.setItem('users', JSON.stringify(users));
   };
 
   return (
@@ -78,13 +70,33 @@ export default function Register() {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-green-700">Username</label>
+            <label className="block mb-1 text-green-700">Nama Lengkap</label>
             <input
               type="text"
               className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Masukkan username"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Masukkan nama lengkap"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-green-700">Tanggal Lahir</label>
+            <input
+              type="date"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
+              value={birthdate}
+              onChange={(e) => setBirthdate(e.target.value)}
+              placeholder="YYYY-MM-DD"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-green-700">No. Telepon</label>
+            <input
+              type="tel"
+              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Masukkan nomor telepon"
             />
           </div>
           <div>
@@ -111,7 +123,11 @@ export default function Register() {
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-green-600"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
               </span>
             </div>
           </div>
@@ -123,9 +139,9 @@ export default function Register() {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="">-- Pilih Role --</option>
-              <option value="pengelola">Pengelola</option>
+              <option value="admin">Pengelola</option>
               <option value="petugas">Petugas</option>
-              <option value="warga">Warga</option>
+              <option value="user">Warga</option>
             </select>
           </div>
           <button

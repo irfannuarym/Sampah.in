@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
 import { loginUser } from '../../services/api';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+} from '@heroicons/react/24/outline';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('');
@@ -17,46 +21,39 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validRoles = ['pengelola', 'petugas', 'warga'];
+    const validRoles = ['admin', 'petugas', 'user'];
     if (!validRoles.includes(role)) {
       toast.error('Role tidak valid!');
       return;
     }
 
-    if (!username || !password) {
-      toast.error('Username dan password harus diisi!');
+    if (!email || !password) {
+      toast.error('Email dan password harus diisi!');
       return;
     }
 
     try {
       setLoading(true);
-      const response = await loginUser({ username, password, role });
+      const response = await loginUser({ email, password, role });
 
-      setLogin(response.user); 
-      localStorage.setItem('loggedInUser', JSON.stringify(response.user));
+      setLogin({
+        token: response.token,
+        role: response.role,
+        name: response.name,
+      });
       toast.success('Login berhasil!');
-
-      navigate(`/dashboard/${response.user.role}`);
+      localStorage.setItem('loggedInUser', JSON.stringify({
+        token: response.token,
+        role: response.role,
+        name: response.name,
+      }));
+      navigate(`/dashboard/${response.role}`);
     } catch (error) {
       toast.error(error.message || 'Login gagal');
     } finally {
       setLoading(false);
     }
 
-    // const users = JSON.parse(localStorage.getItem('users')) || [];
-    // const matchedUser = users.find(
-    //   (user) => user.username === username && user.password === password && user.role === role
-    // );
-
-    // if (!matchedUser) {
-    //   toast.error('Username, password, atau role salah!');
-    //   return;
-    // }
-
-    // setLogin(matchedUser);
-    // toast.success('Login berhasil!');
-    // localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
-    // navigate(`/dashboard/${matchedUser.role}`);
   };
 
   return (
@@ -67,13 +64,13 @@ export default function Login() {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-green-700">Username</label>
+            <label className="block mb-1 text-green-700">Email</label>
             <input
               type="text"
               className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Masukkan username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Masukkan email"
             />
           </div>
           <div>
@@ -90,7 +87,11 @@ export default function Login() {
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-green-600"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
               </span>
             </div>
           </div>
@@ -102,9 +103,9 @@ export default function Login() {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="">-- Pilih Role --</option>
-              <option value="pengelola">Pengelola</option>
+              <option value="admin">Pengelola</option>
               <option value="petugas">Petugas</option>
-              <option value="warga">Warga</option>
+              <option value="user">Warga</option>
             </select>
           </div>
           <button

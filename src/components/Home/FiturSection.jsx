@@ -4,7 +4,7 @@ const features = [
   { title: 'Input Data Sampah', description: 'Petugas bisa mencatat volume dan jenis sampah di lapangan secara real-time.' },
   { title: 'Dashboard Analitik', description: 'Pengelola melihat data teragregasi dalam bentuk grafik dan statistik.' },
   { title: 'Laporan Bulanan', description: 'Laporan otomatis terbuat setiap akhir bulan dan bisa diunduh.' },
-  { title: 'Titik Lokasi Sampah', description: 'Pemetaan lokasi pengangkutan untuk evaluasi dan tindak lanjut.' },
+  { title: 'Peta Tempat Pembuangan Sementara', description: 'Pemetaan lokasi pengangkutan untuk evaluasi dan tindak lanjut.' },
 ];
 
 export default function FeaturesSection() {

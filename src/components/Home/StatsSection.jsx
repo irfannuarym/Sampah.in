@@ -7,10 +7,10 @@ import {
 } from '@heroicons/react/24/solid';
 
 const stats = [
-  { label: 'Titik Sampah', value: 35, icon: MapPinIcon },
-  { label: 'Volume Sampah Bulan Ini', value: '4.2 Ton', icon: TrashIcon },
-  { label: 'Petugas Aktif', value: 12, icon: UserGroupIcon },
-  { label: 'Laporan Masuk', value: 87, icon: DocumentTextIcon },
+  { label: 'Titik Sampah', value: 5, icon: MapPinIcon },
+  { label: 'Volume Sampah Bulan Ini', value: '3.5 Ton', icon: TrashIcon },
+  { label: 'Petugas Aktif', value: 10, icon: UserGroupIcon },
+  { label: 'Laporan Masuk', value: 25, icon: DocumentTextIcon },
 ];
 
 export default function StatsSection() {

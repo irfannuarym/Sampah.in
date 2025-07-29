@@ -52,6 +52,11 @@ export default function CaraKerja() {
           <CaraKerjaCard key={`${item.step}-${item.title}`} {...item} />
         ))}
       </div>
+      <footer className="bg-green-500 text-white py-6 w-full">
+        <div className="text-center px-4">
+          <p className="text-sm">© {new Date().getFullYear()} Sampah.in. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }

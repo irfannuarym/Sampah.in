@@ -12,7 +12,7 @@ export default function NavbarWarga() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <Link to="/warga" className="text-gray-700 hover:text-green-600 font-medium">Dashboard</Link>
+          <Link to="/user" className="text-gray-700 hover:text-green-600 font-medium">Dashboard</Link>
           <Link to="/tentang-kami" className="text-gray-700 hover:text-green-600 font-medium">Tentang Kami</Link>
           <button className="text-red-500 hover:underline font-medium">Keluar</button>
         </div>
