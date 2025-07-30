@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createLaporan } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getLaporanDetail, updateLaporan } from '../../services/api';
 
-export default function LaporSampah() {
+export default function EditLaporan() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-  const id_user = loggedInUser?.id;
+  const [laporan, setLaporan] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -18,7 +21,39 @@ export default function LaporSampah() {
   });
 
   const [previewImage, setPreviewImage] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
+
+  useEffect(() => {
+    fetchLaporanDetail();
+  }, [id]);
+
+  const fetchLaporanDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await getLaporanDetail(id);
+      const laporanData = response.data;
+      
+      setLaporan(laporanData);
+      setFormData({
+        title: laporanData.title,
+        description: laporanData.description,
+        photo: null,
+        tanggal: new Date(laporanData.tanggal).toISOString(),
+        status: laporanData.status,
+        lokasi: laporanData.lokasi || '',
+        kategori: laporanData.kategori,
+      });
+      
+      if (laporanData.photo) {
+        setCurrentImage(laporanData.photo);
+      }
+    } catch (error) {
+      console.error('Error fetching laporan detail:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -44,11 +79,6 @@ export default function LaporSampah() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!id_user) {
-      alert('User belum login!');
-      return;
-    }
-
     // Validate required fields
     if (!formData.title.trim()) {
       alert('Judul laporan harus diisi!');
@@ -73,12 +103,8 @@ export default function LaporSampah() {
     setIsSubmitting(true);
 
     try {
-      // Add artificial delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       // Create FormData for file upload
       const data = new FormData();
-      data.append('id_user', id_user);
       data.append('title', formData.title.trim());
       data.append('description', formData.description.trim());
       data.append('tanggal', formData.tanggal);
@@ -90,28 +116,49 @@ export default function LaporSampah() {
         data.append('photo', formData.photo);
       }
 
-      const response = await createLaporan(data);
-      
-      if (response.success) {
-        alert('Laporan berhasil dikirim!');
-        // Redirect to dashboard after successful submission
-        navigate('/dashboard');
-      } else {
-        alert(`Gagal: ${response.message || 'Terjadi kesalahan'}`);
-      }
+      await updateLaporan(id, data);
+      alert('Laporan berhasil diupdate!');
+      navigate(`/laporan/${id}`);
     } catch (error) {
       console.error('Error:', error);
-      alert(`Gagal mengirim laporan: ${error.message}`);
+      alert(`Gagal mengupdate laporan: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat data laporan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Kembali ke Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold mb-6">Form Lapor Sampah</h1>
+          <h1 className="text-2xl font-bold mb-6">Edit Laporan</h1>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -121,13 +168,11 @@ export default function LaporSampah() {
               <input
                 type="text"
                 name="title"
-                placeholder="Judul Laporan"
                 value={formData.title}
                 onChange={handleChange}
                 required
                 maxLength={50}
-                disabled={isSubmitting}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 
@@ -137,33 +182,43 @@ export default function LaporSampah() {
               </label>
               <textarea
                 name="description"
-                placeholder="Deskripsi"
                 value={formData.description}
                 onChange={handleChange}
                 required
                 maxLength={255}
                 rows={4}
-                disabled={isSubmitting}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Foto Sampah (Opsional)
+                Foto (Opsional)
               </label>
               <input
                 type="file"
                 name="photo"
                 accept="image/*"
                 onChange={handleChange}
-                disabled={isSubmitting}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               
+              {/* Current Image */}
+              {currentImage && !previewImage && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-2">Foto saat ini:</p>
+                  <img
+                    src={currentImage}
+                    alt="Current photo"
+                    className="w-full h-32 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+              
+              {/* Preview New Image */}
               {previewImage && (
                 <div className="mt-2">
-                  <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                  <p className="text-sm text-gray-600 mb-2">Preview foto baru:</p>
                   <img
                     src={previewImage}
                     alt="Preview"
@@ -180,11 +235,9 @@ export default function LaporSampah() {
               <input
                 type="text"
                 name="lokasi"
-                placeholder="Lokasi"
                 value={formData.lokasi}
                 onChange={handleChange}
-                disabled={isSubmitting}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 
@@ -196,8 +249,7 @@ export default function LaporSampah() {
                 name="kategori"
                 value={formData.kategori}
                 onChange={handleChange}
-                disabled={isSubmitting}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 <option value="organik">Organik</option>
                 <option value="anorganik">Anorganik</option>
@@ -205,49 +257,38 @@ export default function LaporSampah() {
               </select>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="Belum di proses">Belum di proses</option>
+                <option value="Proses">Proses</option>
+                <option value="Selesai">Selesai</option>
+              </select>
+            </div>
+
             <div className="flex space-x-4 pt-4">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`flex-1 px-6 py-3 rounded-lg font-medium flex justify-center items-center ${
+                className={`flex-1 px-6 py-3 rounded-lg font-medium ${
                   isSubmitting 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-green-600 hover:bg-green-700'
                 } text-white`}
               >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      ></path>
-                    </svg>
-                    Mengirim...
-                  </div>
-                ) : (
-                  'Kirim Laporan'
-                )}
+                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
-                disabled={isSubmitting}
-                className="flex-1 px-6 py-3 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white disabled:bg-gray-400"
+                onClick={() => navigate(`/laporan/${id}`)}
+                className="flex-1 px-6 py-3 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white"
               >
                 Batal
               </button>

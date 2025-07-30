@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 export default function UpdateProfile() {
   const [form, setForm] = useState({ name: '', birthdate: '', phone: '' });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -11,21 +13,35 @@ export default function UpdateProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      const token = loggedInUser?.token;
+
       const response = await fetch('http://localhost:5000/api/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify(form),
       });
 
       const data = await response.json();
       if (response.ok) {
-        toast.success(data.message || 'Profil berhasil diperbarui!');
-      } else {
-        toast.error(data.error || 'Profil gagal diperbarui!');
-      }
+      toast.success(data.message || 'Profil berhasil diperbarui!');
+      // Ambil data lama dari localStorage
+      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      // Update nama di localStorage
+      localStorage.setItem('loggedInUser', JSON.stringify({
+        ...loggedInUser,
+        name: form.name,
+      }));
+      // Redirect ke dashboard
+      navigate(`/dashboard/${loggedInUser.role}`);
+      // Auto refresh setelah redirect
+      setTimeout(() => window.location.reload(), 100);
+    } else {
+      toast.error(data.error || 'Profil gagal diperbarui!');
+    }
     } catch (err) {
       console.error(err);
       toast.error('Terjadi kesalahan jaringan.');

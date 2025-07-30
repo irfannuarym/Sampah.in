@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   EyeIcon,
@@ -18,6 +19,8 @@ export default function ChangePassword() {
     confirmPassword: '',
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -31,12 +34,15 @@ export default function ChangePassword() {
     }
 
     try {
+      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      const token = loggedInUser?.token;
+
       const response = await fetch('http://localhost:5000/api/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           oldPassword: form.oldPassword,
           newPassword: form.newPassword,
@@ -47,6 +53,8 @@ export default function ChangePassword() {
       if (response.ok) {
         toast.success(data.message || 'Password berhasil diubah!');
         setForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+        // Redirect ke dashboard sesuai role
+        navigate(`/dashboard/${loggedInUser.role}`);
       } else {
         toast.error(data.error || 'Gagal mengubah password.');
       }

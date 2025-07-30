@@ -14,19 +14,12 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const validRoles = ['admin', 'petugas', 'user'];
-    if (!validRoles.includes(role)) {
-      toast.error('Role tidak valid!');
-      return;
-    }
 
     if (!name || !birthdate || !phone || !email || !password) {
       toast.error('Semua field harus diisi!');
@@ -45,14 +38,26 @@ export default function Register() {
 
     try {
       setLoading(true);
-      await registerUser({ name, birthdate, phone, email, password, role });
+      // Add artificial delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Set default role to 'user'
+      const userData = { 
+        name, 
+        birthdate, 
+        phone, 
+        email, 
+        password, 
+        role: 'user' 
+      };
+      
+      await registerUser(userData);
       toast.success('Registrasi berhasil!');
       setName('');
       setBirthdate('');
       setPhone('');
       setEmail('');
       setPassword('');
-      setRole('');
       navigate('/login');
     } catch (error) {
       const msg = error.message || 'Registrasi gagal!';
@@ -77,6 +82,7 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Masukkan nama lengkap"
+              disabled={loading}
             />
           </div>
           <div>
@@ -87,6 +93,7 @@ export default function Register() {
               value={birthdate}
               onChange={(e) => setBirthdate(e.target.value)}
               placeholder="YYYY-MM-DD"
+              disabled={loading}
             />
           </div>
           <div>
@@ -97,6 +104,7 @@ export default function Register() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Masukkan nomor telepon"
+              disabled={loading}
             />
           </div>
           <div>
@@ -107,6 +115,7 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukkan email"
+              disabled={loading}
             />
           </div>
           <div>
@@ -118,6 +127,7 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan password"
+                disabled={loading}
               />
               <span
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-green-600"
@@ -130,19 +140,6 @@ export default function Register() {
                 )}
               </span>
             </div>
-          </div>
-          <div>
-            <label className="block mb-1 text-green-700">Role</label>
-            <select
-              className="w-full border border-green-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 bg-white"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="">-- Pilih Role --</option>
-              <option value="admin">Pengelola</option>
-              <option value="petugas">Petugas</option>
-              <option value="user">Warga</option>
-            </select>
           </div>
           <button
             type="submit"
@@ -183,6 +180,7 @@ export default function Register() {
               type="button"
               className="text-green-600 hover:underline"
               onClick={() => navigate('/login')}
+              disabled={loading}
             >
               Login di sini
             </button>

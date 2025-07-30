@@ -99,9 +99,12 @@ export default function Home() {
           <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-2">
             {isLoggedIn ? (
               <>
-                <span className="flex items-center text-lg font-semibold text-white hover:bg-white hover:text-green-500 hover:rounded-md transition px-3 py-1">
+                <Link 
+                  to={roleToPath[user?.role] || '/'}
+                  className="flex items-center text-lg font-semibold text-white hover:bg-white hover:text-green-500 hover:rounded-md transition px-3 py-1"
+                >
                   {user.name}
-                </span>
+                </Link>
                 <button
                   onClick={logout}
                   className="flex items-center text-lg font-semibold text-white hover:bg-white hover:text-green-500 hover:rounded-md transition px-3 py-1"
