@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://sampahinapi-production.up.railway.app';
 
 const addDelay = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
 
