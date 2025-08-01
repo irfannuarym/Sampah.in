@@ -33,7 +33,7 @@
 
 ---
 
-## Instalasi
+## ⚙️ Instalasi
 
 ```bash
 # Clone the repository
@@ -48,6 +48,7 @@ npm install
 
 ## 📁 Struktur Direktori
 
+```
 src/
 ├── assets/
 ├── components/
@@ -57,6 +58,7 @@ src/
 ├── store/
 ├── App.jsx
 └── main.jsx
+```
 
 ## 🧪 Development
 
@@ -85,9 +87,11 @@ npm run lint
 
 ## 👥 Tim Pengembang
 
+```
 Nina Agustina
 Wayan Christian Pradayana
 Irfan Nuary Muliawan
 Muh Berlian Taqiyyuddin Fakhir
+```
 
 ---
