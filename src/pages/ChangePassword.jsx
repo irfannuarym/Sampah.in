@@ -53,7 +53,6 @@ export default function ChangePassword() {
       if (response.ok) {
         toast.success(data.message || 'Password berhasil diubah!');
         setForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
-        // Redirect ke dashboard sesuai role
         navigate(`/dashboard/${loggedInUser.role}`);
       } else {
         toast.error(data.error || 'Gagal mengubah password.');

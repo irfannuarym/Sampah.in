@@ -38,10 +38,7 @@ export default function Register() {
 
     try {
       setLoading(true);
-      // Add artificial delay for better UX
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Set default role to 'user'
       const userData = { 
         name, 
         birthdate, 

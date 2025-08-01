@@ -25,8 +25,6 @@ export default function LaporSampah() {
     if (name === 'photo') {
       const file = files[0];
       setFormData({ ...formData, photo: file });
-      
-      // Create preview
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -49,7 +47,6 @@ export default function LaporSampah() {
       return;
     }
 
-    // Validate required fields
     if (!formData.title.trim()) {
       alert('Judul laporan harus diisi!');
       return;
@@ -73,10 +70,8 @@ export default function LaporSampah() {
     setIsSubmitting(true);
 
     try {
-      // Add artificial delay for better UX
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Create FormData for file upload
+
       const data = new FormData();
       data.append('id_user', id_user);
       data.append('title', formData.title.trim());
@@ -85,16 +80,15 @@ export default function LaporSampah() {
       data.append('status', formData.status);
       data.append('lokasi', formData.lokasi.trim() || '');
       data.append('kategori', formData.kategori);
-      
+
       if (formData.photo) {
         data.append('photo', formData.photo);
       }
 
       const response = await createLaporan(data);
-      
+
       if (response.success) {
         alert('Laporan berhasil dikirim!');
-        // Redirect to dashboard after successful submission
         navigate('/dashboard');
       } else {
         alert(`Gagal: ${response.message || 'Terjadi kesalahan'}`);

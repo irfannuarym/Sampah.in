@@ -27,7 +27,6 @@ export default function Login() {
 
     try {
       setLoading(true);
-      // Add artificial delay for better UX
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       const response = await loginUser({ email, password });

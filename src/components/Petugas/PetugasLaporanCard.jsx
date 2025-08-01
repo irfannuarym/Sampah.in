@@ -47,7 +47,7 @@ export default function PetugasLaporanCard({ laporan, onUpdate }) {
     try {
       setIsUpdating(true);
       await updateLaporanStatus(laporan.id, newStatus);
-      onUpdate(); // Refresh the list
+      onUpdate();
     } catch (error) {
       alert(`Gagal mengupdate status: ${error.message}`);
     } finally {
@@ -57,7 +57,6 @@ export default function PetugasLaporanCard({ laporan, onUpdate }) {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow border hover:shadow-md transition-shadow">
-      {/* Image Preview */}
       {laporan.photo && (
         <div className="mb-3">
           <img

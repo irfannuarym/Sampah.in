@@ -1,12 +1,10 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Helper function to add delay
 const addDelay = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function registerUser(userData) {
-  // Add delay for better UX
   await addDelay(1500);
-  
+
   const response = await fetch(`${API_BASE_URL}/register`, {
     method: 'POST',
     headers: {
@@ -24,9 +22,8 @@ export async function registerUser(userData) {
 }
 
 export async function loginUser({ email, password }) {
-  // Add delay for better UX
   await addDelay(1200);
-  
+
   const response = await fetch(`${API_BASE_URL}/login`, {
     method: 'POST',
     headers: {
@@ -163,7 +160,7 @@ export async function getLaporanDetail(laporanId) {
 export async function createLaporan(laporanData) {
   const response = await fetch(`${API_BASE_URL}/laporan`, {
     method: 'POST',
-    body: laporanData, // FormData
+    body: laporanData,
   });
 
   if (!response.ok) {
@@ -177,7 +174,7 @@ export async function createLaporan(laporanData) {
 export async function updateLaporan(laporanId, laporanData) {
   const response = await fetch(`${API_BASE_URL}/laporan/${laporanId}`, {
     method: 'PUT',
-    body: laporanData, // FormData
+    body: laporanData,
   });
 
   if (!response.ok) {

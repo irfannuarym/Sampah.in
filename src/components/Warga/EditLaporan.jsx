@@ -60,8 +60,6 @@ export default function EditLaporan() {
     if (name === 'photo') {
       const file = files[0];
       setFormData({ ...formData, photo: file });
-      
-      // Create preview
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -79,7 +77,6 @@ export default function EditLaporan() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!formData.title.trim()) {
       alert('Judul laporan harus diisi!');
       return;
@@ -103,7 +100,6 @@ export default function EditLaporan() {
     setIsSubmitting(true);
 
     try {
-      // Create FormData for file upload
       const data = new FormData();
       data.append('title', formData.title.trim());
       data.append('description', formData.description.trim());

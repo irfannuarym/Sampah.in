@@ -60,8 +60,6 @@ export default function PetugasEditLaporan() {
     if (name === 'photo') {
       const file = files[0];
       setFormData({ ...formData, photo: file });
-      
-      // Create preview
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -79,7 +77,6 @@ export default function PetugasEditLaporan() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!formData.title.trim()) {
       alert('Judul laporan harus diisi!');
       return;
@@ -103,7 +100,6 @@ export default function PetugasEditLaporan() {
     setIsSubmitting(true);
 
     try {
-      // Create FormData for file upload
       const data = new FormData();
       data.append('title', formData.title.trim());
       data.append('description', formData.description.trim());
@@ -202,7 +198,7 @@ export default function PetugasEditLaporan() {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
-              
+
               {/* Current Image */}
               {currentImage && !previewImage && (
                 <div className="mt-2">
@@ -214,7 +210,7 @@ export default function PetugasEditLaporan() {
                   />
                 </div>
               )}
-              
+
               {/* Preview New Image */}
               {previewImage && (
                 <div className="mt-2">
